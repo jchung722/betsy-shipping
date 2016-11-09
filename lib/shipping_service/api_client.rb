@@ -7,17 +7,31 @@ module ShippingService::APIClient
     {id: 4, name: "FedEx 2 Day", cost: 68.46},
   ]
 
+  BASE_URL = "http://localhost:3000/"
+
   def methods_for_order(order)
+    destination = {city: order.city, state: order.state, zip: order.billing_zip, country: 'US'}.to_query
+    origin = {city: 'Seattle', state: 'WA', zip: '98102', country: 'US'}.to_query
+    packages = {packages: {weight: order.total_weight, size: [10,10,10]}}.to_query
+
+    url = BASE_URL + "/shippings?destination=#{destination}&origin=#{origin}&packages=#{packages}"
+
+
+
+    data = HTTParty.get(url)
+
+
     # The real implementation should use the order's
     # shipping details, calculate the weight of every
     # product in the order, and send that info to the API
     # along with a pre-defined "source" address.
     #
     # Instead we'll just return the fake data from above
-    FAKE_METHOD_DATA.map do |data|
-      method_from_data(data)
-    end
+    # data.map do |data|
+    #   method_from_data(data)
+    # end
   end
+
 
   def get_method(id)
     # The real implementation should send this ID off to
