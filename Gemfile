@@ -1,6 +1,9 @@
 source 'https://rubygems.org'
 ruby '2.3.1'
 
+
+# API GEMS
+gem 'httparty'
 ### RAILS ####
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7'
@@ -32,6 +35,9 @@ gem 'omniauth-github'
 group :development, :test do
   gem 'dotenv-rails'
   gem 'pry-byebug'
+  # API testing
+  gem 'minitest-vcr'
+  gem 'webmock'
 end
 
 group :development do
