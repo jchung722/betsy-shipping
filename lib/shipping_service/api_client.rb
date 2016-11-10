@@ -50,8 +50,8 @@ module ShippingService::APIClient
     mapped = response.map.with_index {|datum, i|  method_from_data(i, datum)}
   end
 
-  def method_select(id)
-    data = data_for_id(id)
+  def method_select(id, shipping_methods)
+    data = data_for_id(id, shipping_methods)
     if data.nil?
       raise ShippingService::ShippingMethodNotFound.new
     end
@@ -61,13 +61,13 @@ module ShippingService::APIClient
 
   private
 
-  def data_for_id(id)
+  def data_for_id(id, shipping_methods)
 
     if id.nil?
       raise ShippingService::ShippingMethodNotFound.new
     end
 
-    ShippingService::ShippingMethod.all.select { |data| data[:id] == id.to_i }.first
+    shipping_methods.select { |data| data[:id] == id.to_i }.first
   end
 
   def method_from_data(i, data)

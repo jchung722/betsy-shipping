@@ -58,8 +58,7 @@ class OrdersController < ApplicationController
   def shipping_set
     shipping_methods = params["shipping_methods"]
     raise
-    selected_method = ShippingService.method_select(order_shipping_params[:shipping_method_id])
-
+    selected_method = ShippingService.method_select(order_shipping_params[:shipping_method_id], @shipping_methods)
     if !current_order.update(shipping_method: selected_method)
       redirect_to shipping_order_path, notice:
         "Sorry something went wrong, please try again in a few moments."
@@ -96,7 +95,7 @@ class OrdersController < ApplicationController
   end
 
   def order_shipping_params
-    params.permit(:shipping_method_id)
+    params.permit(:shipping_method_id, :shipping_methods => [])
   end
 
   def truncate_cc_number
