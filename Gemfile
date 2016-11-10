@@ -4,6 +4,8 @@ ruby '2.3.1'
 
 # API GEMS
 gem 'httparty'
+# Zip code gem automatically gets city and state from zip current_order
+gem 'zip-codes'
 ### RAILS ####
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7'

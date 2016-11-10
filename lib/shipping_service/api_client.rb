@@ -10,25 +10,38 @@ module ShippingService::APIClient
   BASE_URL = "https://nj-shipping-api.herokuapp.com"
 
   def methods_for_order(order)
-    destination = {city: order.city, state: order.state, zip: order.billing_zip, country: 'US'}
-    origin = {city: 'Beverly Hills', state: 'CA', zip: '90210', country: 'US'}
-    packages = {weight: order.total_weight, size: [10,10,10]}
 
-    url = BASE_URL + "/shippings"
+    addresses = []
+    order.orderitems.each do |orderitem|
+      zip = orderitem.product.user.zip
+      zip_address = ZipCodes.identify(zip)
+      addresses << {city: zip_address[:city], state: zip_address[:state_code], zip: zip, country:'US'}
+    end
 
-    data = HTTParty.get(url,
-      query: {
-        "packages" => "#{packages}",
-        "origin" => "#{origin}",
-        "destination" => "#{destination}"
-      })
+    mapped_list = []
+    addresses.each do |address|
+      destination = {city: order.city, state: order.state, zip: order.billing_zip, country: 'US'}
+      origin = address
+      packages = {weight: order.total_weight, size: [10,10,10]}
 
-    response = data.parsed_response
-    mapped = response.map.with_index {|datum, i|  method_from_data(i, datum)}
-    return mapped
+      url = BASE_URL + "/shippings"
+
+      data = HTTParty.get(url,
+        query: {
+          "packages" => "#{packages}",
+          "origin" => "#{origin}",
+          "destination" => "#{destination}"
+        })
+
+      response = data.parsed_response
+      mapped = response.map.with_index {|datum, i|  method_from_data(i, datum)}
+      mapped_list << mapped
+    end
+
+    mapped_list.transpose.map.with_index {|x, i| x = [x[0][0], x[0][1], x[i][2].reduce(:+)]}
+
   end
-
-
+  
   def get_method(carrier_name, order)
     carrier = carrier_name
     destination = {city: order.city, state: order.state, zip: order.billing_zip, country: 'US'}
