@@ -10,10 +10,11 @@
 
 <h4>Please select one of the following shipping options:</h4><br>
 <%= form_tag shipping_order_path,{method: :patch, params["shipping_methods"] => @shipping_methods, :class => "form-horizontal center"} do %>
+  <%= hidden_field_tag :carrier_name, @carrier_name%>
   <!-- <%= hidden_field_tag "shipping_methods[]", @shipping_methods %> -->
-  <% @shipping_methods.map do |method| %>
+  <!-- <% @shipping_methods.map do |method| %>
     <%= hidden_field_tag "shipping_methods[]", method %>
-  <% end %>
+  <% end %> -->
 
 
   <% @shipping_methods.each do |method| %>

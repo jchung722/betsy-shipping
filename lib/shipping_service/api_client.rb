@@ -23,7 +23,6 @@ module ShippingService::APIClient
         "destination" => "#{destination}"
       })
 
-    i=0
     response = data.parsed_response
     mapped = response.map.with_index {|datum, i|  method_from_data(i, datum)}
     return mapped
@@ -45,9 +44,9 @@ module ShippingService::APIClient
         "destination" => "#{destination}"
       })
 
-    i=0
     response = data.parsed_response
     mapped = response.map.with_index {|datum, i|  method_from_data(i, datum)}
+    return mapped
   end
 
   def method_select(id, shipping_methods)
@@ -56,7 +55,7 @@ module ShippingService::APIClient
       raise ShippingService::ShippingMethodNotFound.new
     end
 
-    method_from_data(id, data)
+    data
   end
 
   private
@@ -67,7 +66,7 @@ module ShippingService::APIClient
       raise ShippingService::ShippingMethodNotFound.new
     end
 
-    shipping_methods.select { |data| data[:id] == id.to_i }.first
+    shipping_methods.select { |data| data.id == id.to_i }.first
   end
 
   def method_from_data(i, data)

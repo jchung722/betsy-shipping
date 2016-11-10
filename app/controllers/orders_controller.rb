@@ -1,6 +1,7 @@
 class OrdersController < ApplicationController
   before_action :require_login, only: [:show_seller_orders]
   before_action :truncate_cc_number, only: [:update]
+  before_action :new_shipping_method, only: [:shipping_select, :shipping_set]
 
   attr_reader :shipping_methods
 
@@ -46,18 +47,9 @@ class OrdersController < ApplicationController
   end
 
   def shipping_select
-    carrier_name = params[:carrier_name]
-    @order = current_order
-    if carrier_name
-      @shipping_methods = ShippingService.get_method(carrier_name, @order)
-    else
-      @shipping_methods = ShippingService.methods_for_order(current_order)
-    end
   end
 
   def shipping_set
-    shipping_methods = params["shipping_methods"]
-    raise
     selected_method = ShippingService.method_select(order_shipping_params[:shipping_method_id], @shipping_methods)
     if !current_order.update(shipping_method: selected_method)
       redirect_to shipping_order_path, notice:
@@ -102,6 +94,16 @@ class OrdersController < ApplicationController
     if params[:order] && params[:order][:credit_card_number]
       card_num = params[:order][:credit_card_number]
       card_num.slice!(0..12) || (card_num = "")
+    end
+  end
+
+  def new_shipping_method
+    @carrier_name = params[:carrier_name]
+    @order = current_order
+    if @carrier_name
+      @shipping_methods = ShippingService.get_method(@carrier_name, @order)
+    else
+      @shipping_methods = ShippingService.methods_for_order(current_order)
     end
   end
 
