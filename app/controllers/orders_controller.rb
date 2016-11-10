@@ -2,6 +2,8 @@ class OrdersController < ApplicationController
   before_action :require_login, only: [:show_seller_orders]
   before_action :truncate_cc_number, only: [:update]
 
+  attr_reader :shipping_methods
+
   def show
     @orders = Order.find(current_order.id).orderitems
   end
@@ -44,12 +46,19 @@ class OrdersController < ApplicationController
   end
 
   def shipping_select
+    carrier_name = params[:carrier_name]
     @order = current_order
-    @shipping_methods = ShippingService.methods_for_order(current_order)
+    if carrier_name
+      @shipping_methods = ShippingService.get_method(carrier_name, @order)
+    else
+      @shipping_methods = ShippingService.methods_for_order(current_order)
+    end
   end
 
   def shipping_set
-    selected_method = ShippingService.get_method(order_shipping_params[:shipping_method_id])
+    shipping_methods = params["shipping_methods"]
+    raise
+    selected_method = ShippingService.method_select(order_shipping_params[:shipping_method_id])
 
     if !current_order.update(shipping_method: selected_method)
       redirect_to shipping_order_path, notice:
